@@ -74,13 +74,31 @@ func GetFoods() gin.HandlerFunc {
 func GetFood() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
-		foodId := c.Param("food_id")
-		food := models.Food{}
-
-		err := foodCollection.FindOne(ctx, bson.M{"food_id":foodId}).Decode(&food)
 		defer cancel()
+
+		foodId := c.Param("food_id")
+		// food := models.Food{} //mongo
+
+		// Parse foodId as UUID
+		uuidFoodId, err := uuid.Parse(foodId)
 		if err != nil{
-			c.JSON(http.StatusInternalServerError, gin.H{"error":"error occured while fetching the food item"})
+			c.JSON(http.StatusBadRequest, gin.H{"error":"invalid food_id"})
+		}
+
+		// err := foodCollection.FindOne(ctx, bson.M{"food_id":foodId}).Decode(&food) // mongo
+		// if err != nil{
+		// 	c.JSON(http.StatusInternalServerError, gin.H{"error":"error occured while fetching the food item"})
+		// }
+
+		// Fetch food item using generated SQL query
+		food, err := queries.GetFoodByFoodID(ctx, uuidFoodId)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.JSON(http.StatusNotFound, gin.H{"error": "food item not found"})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "error occurred while fetching the food item"})
+			}
+			return
 		}
 		c.JSON(http.StatusOK, food)			
 	}

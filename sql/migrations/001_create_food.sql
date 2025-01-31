@@ -1,0 +1,14 @@
+-- +goose Up
+CREATE TABLE food(
+	id 			SERIAL PRIMARY KEY,
+	name 		VARCHAR(100) NOT NULL,
+	price 		DECIMAL(10, 2) NOT NULL,
+	food_image 	TEXT NOT NULL,
+	created_at 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	food_id 	UUID NOT NULL UNIQUE,
+	menu_id 	UUID NOT NULL
+);
+
+-- +goose Down
+DROP TABLE food;

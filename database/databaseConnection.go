@@ -13,9 +13,8 @@ import (
 )
 
 func DBinstance() *mongo.Client{
-	// Load .env file
-	err := godotenv.Load()
-	if err != nil {
+	// Load .env file	
+	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
@@ -26,7 +25,7 @@ func DBinstance() *mongo.Client{
 		log.Fatal("Database credentials are missing. Set DB_USERNAME and DB_PASSWORD in environment variables.")
 	}
 
-	MongoDb := fmt.Sprintf(
+	MongoDbURI := fmt.Sprintf(
 		"mongodb+srv://%s:%s@restaurant-management-g.gbdz0.mongodb.net/?retryWrites=true&w=majority&appName=Restaurant-Management-Golang", 
 		DBUserName, DBPassword,
 	)  // you can use the online link as well
@@ -35,7 +34,7 @@ func DBinstance() *mongo.Client{
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(MongoDb))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(MongoDbURI))
 	if err != nil{
 		log.Fatal(err)
 	}

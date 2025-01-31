@@ -23,6 +23,9 @@ func main(){
 
 	// using gin router
 	router := gin.New()
+
+	router.SetTrustedProxies([]string{})
+
 	router.Use(gin.Logger())
 
 	routes.UserRoutes(router)
